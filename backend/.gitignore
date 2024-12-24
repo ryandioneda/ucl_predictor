@@ -1,0 +1,12 @@
+env/
+.env
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+*.log
+*.pot
+*.pyc
+media/
+staticfiles/
