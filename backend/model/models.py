@@ -1,6 +1,10 @@
 from django.db import models
 
 # Create your models here.
+
+from django.db import models
+
+# Create your models here.
 class Team(models.Model):
     """A team in the current UCL Competition"""
     name = models.CharField(max_length=100, unique=True)

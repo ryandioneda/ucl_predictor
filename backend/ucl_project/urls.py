@@ -19,18 +19,15 @@ from django.urls import path, include
 
 
 from rest_framework.routers import DefaultRouter
-from api.urls import api_router
 
 from django.urls import path, include
 
 router = DefaultRouter()
 
 #extend router for applications
-router.registry.extend(api_router.registry)
 
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include(router.urls)) #main path
 ]

@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     #My apps
     'corsheaders',
     'rest_framework',
-    'api',
+    'model',
     
     'django.contrib.admin',
     'django.contrib.auth',
