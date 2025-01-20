@@ -76,7 +76,6 @@ def parse_ucl_all_time_performance_df(dataframe):
 
     if missing_columns:
         raise KeyError(f"There are missing columns in the dataframe: {missing_columns}")
-    print("hello") 
     return dataframe
 
 
