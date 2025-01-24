@@ -78,6 +78,78 @@ def parse_ucl_all_time_performance_df(dataframe):
         raise KeyError(f"There are missing columns in the dataframe: {missing_columns}")
     return dataframe
 
+def parse_ucl_2016_2022_matches_df(dataframe):
+    """
+    Parse the UCL 2016-2022 matches dataframe (data from the UEFA Champions League 2016-2022 Matches.csv)
+
+    Args:
+        dataframe: A pandas dataframe
+    
+    Returns:
+        pd.Dataframe: A parsed dataframe
+    """
+    required_columns = ['SEASON', 'DATE_TIME', 'HOME_TEAM', 'AWAY_TEAM', 'STADIUM', 'HOME_TEAM_SCORE', 'AWAY_TEAM_SCORE']
+    missing_columns = []
+
+    for col in required_columns:
+        if col not in dataframe.columns:
+            missing_columns.append(col)
+
+    if missing_columns:
+        raise KeyError(f"There are missing columns in the dataframe: {missing_columns}")
+   
+
+    dataframe["date"] = pd.to_datetime(dataframe["DATE_TIME"], format='%d-%b-%y %I.%M.%S.%f %p')
+    dataframe["hour"] = dataframe["date"].dt.hour
+    dataframe["day"] = dataframe["date"].dt.dayofweek
+
+    dataframe.drop('DATE_TIME', axis=1, inplace=True)
+
+    home_rows = (
+        dataframe.assign(
+            team=dataframe['HOME_TEAM'],
+            opponent=dataframe['AWAY_TEAM'],
+            is_home=1,
+            goals_for=dataframe['HOME_TEAM_SCORE'],
+            goals_against=dataframe['AWAY_TEAM_SCORE']
+        )
+        .assign(
+            result=lambda df: df.apply(
+                lambda row: (
+                    "win" if row["goals_for"] > row["goals_against"] 
+                    else "lose" if row["goals_for"] < row["goals_against"] 
+                    else "draw"
+                ),
+                axis=1
+            )
+        )
+        .drop(columns=["HOME_TEAM", "AWAY_TEAM", "HOME_TEAM_SCORE", "AWAY_TEAM_SCORE"])
+    )
+
+
+    away_rows = (
+        dataframe.assign(
+            team=dataframe['AWAY_TEAM'],
+            opponent=dataframe['HOME_TEAM'],
+            is_home=0,
+            goals_for=dataframe['AWAY_TEAM_SCORE'],
+            goals_against=dataframe['HOME_TEAM_SCORE']
+        )
+        .assign(
+            result=lambda df: df.apply(
+                lambda row: (
+                    "win" if row["goals_for"] > row["goals_against"] 
+                    else "lose" if row["goals_for"] < row["goals_against"] 
+                    else "draw"
+                ),
+                axis=1
+            )
+        )
+        .drop(columns=["HOME_TEAM", "AWAY_TEAM", "HOME_TEAM_SCORE", "AWAY_TEAM_SCORE"])
+    )
+
+    result_dataframe = pd.concat([home_rows, away_rows]).sort_index().reset_index(drop=True)
+    return result_dataframe
 
 
 
